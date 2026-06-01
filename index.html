@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1a2e">
+<title>Purvi's Learning Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1a2e;--ink-soft:#4a4a6a;--ink-muted:#9090b0;--cream:#faf8f3;--cream-dark:#ede8d8;--teal:#0d9488;--teal-l:#ccfbf1;--amber:#d97706;--amber-l:#fef3c7;--rose:#be185d;--rose-l:#fce7f3;--violet:#7c3aed;--violet-l:#ede9fe;--blue:#0369a1;--blue-l:#e0f2fe;--green:#059669;--green-l:#d1fae5;--r:14px;--rs:8px;--lock:#b0b0c0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;min-height:100vh;overflow-x:hidden}
+.app{max-width:780px;margin:0 auto;min-height:100vh;background:var(--cream);position:relative;padding-bottom:78px}
+.topbar{background:var(--ink);color:var(--cream);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar .tb-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.topbar .tb-sub{font-size:10px;color:var(--ink-muted);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.tb-badge{background:rgba(13,148,136,.2);color:#5eead4;font-size:11px;padding:5px 11px;border-radius:99px;font-weight:500}
+.view{display:none;animation:fade .3s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.hero{background:var(--ink);color:var(--cream);padding:24px 20px 32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(13,148,136,.12)}
+.hero-eye{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5eead4;margin-bottom:10px;font-weight:600;position:relative}
+.hero h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1.15;margin-bottom:10px;position:relative}
+.hero h1 em{font-style:italic;color:#5eead4}
+.hero-desc{font-size:13px;color:rgba(250,248,243,.72);line-height:1.6;position:relative;max-width:90%}
+.hero-stats{display:flex;gap:20px;margin-top:20px;position:relative}
+.hs-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(250,248,243,.5);margin-top:3px}
+.progress-card{margin:16px;background:#fff;border-radius:var(--r);padding:16px 18px;box-shadow:0 2px 12px rgba(26,26,46,.06)}
+.pc-lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.pc-lbl span{font-size:12px;color:var(--ink-soft)}.pc-lbl strong{font-size:12px;color:var(--ink)}
+.pc-track{height:7px;background:var(--cream-dark);border-radius:99px;overflow:hidden}
+.pc-fill{height:100%;background:var(--teal);border-radius:99px;transition:width .6s ease}
+.content{padding:8px 16px 24px}
+.sec-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin:18px 4px 4px}
+.sec-sub{font-size:12px;color:var(--ink-soft);margin:0 4px 14px}
+.wlist{display:flex;flex-direction:column;gap:12px}
+.wcard{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 2px 12px rgba(26,26,46,.06);position:relative;overflow:hidden;transition:transform .15s;border:1.5px solid transparent}
+.wcard.unlocked{cursor:pointer}
+.wcard.unlocked:active{transform:scale(.985)}
+.wcard::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--wc,var(--teal))}
+.wcard.locked{opacity:.62}
+.wcard.locked::before{background:var(--lock)}
+.wcard.current{border-color:var(--teal)}
+.wc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.wc-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-muted);letter-spacing:.06em;margin-bottom:5px}
+.wc-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;line-height:1.3}
+.wc-status{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.wc-status.lock{background:var(--cream-dark);color:var(--lock)}
+.wc-status.open{background:var(--teal-l);color:var(--teal)}
+.wc-status.past{background:var(--teal);color:#fff}
+.wc-desc{font-size:12px;color:var(--ink-soft);line-height:1.55;margin-bottom:12px}
+.wc-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10px;padding:3px 9px;border-radius:99px;font-weight:500}
+.wc-lockmsg{font-size:11px;color:var(--lock);display:flex;align-items:center;gap:5px;margin-top:10px;font-style:italic}
+.wd-hero{padding:18px 16px 20px}
+.wd-back{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink-soft);cursor:pointer;margin-bottom:14px;font-weight:500}
+.wd-badges{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.wd-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;line-height:1.2;margin-bottom:10px}
+.wd-overview{font-size:13px;color:var(--ink-soft);line-height:1.65}
+.wd-dates{font-size:11px;color:var(--ink-muted);margin-top:8px;font-family:'DM Mono',monospace}
+.tabbar{display:flex;background:#fff;border-radius:var(--r);margin:0 16px 16px;padding:5px;gap:4px;box-shadow:0 2px 8px rgba(26,26,46,.05)}
+.tab{flex:1;text-align:center;padding:9px 6px;font-size:12px;font-weight:500;color:var(--ink-muted);cursor:pointer;border-radius:var(--rs);transition:all .15s}
+.tab.active{background:var(--ink);color:#fff}
+.tabcontent{display:none;padding:0 16px}
+.tabcontent.active{display:block;animation:fade .25s ease}
+.daycard{background:#fff;border-radius:var(--r);margin-bottom:11px;overflow:hidden;box-shadow:0 2px 10px rgba(26,26,46,.05)}
+.daycard-hdr{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;user-select:none}
+.daybadge{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;flex-shrink:0}
+.daycard-ttl{flex:1;min-width:0}
+.daycard-ttl h4{font-size:14px;font-weight:600;margin-bottom:1px;line-height:1.3}
+.daycard-ttl p{font-size:11px;color:var(--ink-muted)}
+.daychev{font-size:16px;color:var(--ink-muted);transition:transform .2s;flex-shrink:0}
+.daycard.open .daychev{transform:rotate(180deg)}
+.daycard-body{display:none;padding:0 16px 16px;border-top:1px solid var(--cream-dark)}
+.daycard.open .daycard-body{display:block}
+.act-item{padding:11px 0;border-bottom:1px solid var(--cream-dark)}
+.act-item:last-child{border-bottom:none}
+.act-row{display:flex;gap:10px;align-items:flex-start}
+.act-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-muted);min-width:62px;padding-top:2px;flex-shrink:0}
+.act-desc{font-size:13px;color:var(--ink);line-height:1.5;flex:1}
+.act-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;margin-left:72px}
+.act-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:5px 11px;border-radius:99px;text-decoration:none;border:1px solid transparent}
+.act-link:active{opacity:.7}
+.al-yt{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.al-web{background:#e0f2fe;color:#0369a1;border-color:#7dd3fc}
+.al-sim{background:#ede9fe;color:#5b21b6;border-color:#c4b5fd}
+.al-pod{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.al-read{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
+.banner{background:var(--teal-l);border:1.5px solid var(--teal);border-radius:var(--r);padding:18px;margin:18px 16px;text-align:center}
+.banner h4{font-family:'Playfair Display',serif;font-size:16px;color:var(--teal);margin-bottom:6px}
+.banner p{font-size:12px;color:#0f766e;margin-bottom:14px;line-height:1.5}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:var(--rs);padding:12px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn:active{transform:scale(.97)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:active{background:#0f766e}
+.btn-ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}
+.res-day{margin-bottom:18px}
+.res-day-ttl{font-size:12px;font-weight:600;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--cream-dark)}
+.res-link{display:flex;align-items:center;gap:9px;background:#fff;border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;text-decoration:none;color:var(--ink);box-shadow:0 1px 5px rgba(26,26,46,.04)}
+.res-link:active{background:var(--cream)}
+.res-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.res-txt{flex:1;font-size:13px;font-weight:500;line-height:1.3}
+.res-type{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;flex-shrink:0}
+.form-card{background:#fff;border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(26,26,46,.05)}
+.form-card h3{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:5px}
+.form-card>p{font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.5}
+.form-frame{width:100%;border:none;border-radius:var(--rs);background:var(--cream)}
+.info-box{background:var(--blue-l);border:1px solid #7dd3fc;border-radius:var(--rs);padding:12px 14px;font-size:12px;color:#075985;line-height:1.5;margin-bottom:14px}
+.warn-box{background:var(--amber-l);border:1px solid #fcd34d;border-radius:var(--rs);padding:12px 14px;font-size:12px;color:#92400e;line-height:1.5;margin:0 16px 14px}
+.rcard{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(26,26,46,.05)}
+.rcard .rctype{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.rcard h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.rcard .rcauth{font-size:11px;color:var(--ink-muted);margin-bottom:8px}
+.rcard .rcdesc{font-size:12px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px}
+.rcard .rcwhen{font-size:10px;color:var(--ink-muted);margin-bottom:10px}
+.botnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:780px;background:#fff;border-top:1px solid var(--cream-dark);display:flex;padding:8px 6px;padding-bottom:max(8px,env(safe-area-inset-bottom));z-index:60;box-shadow:0 -2px 16px rgba(26,26,46,.06)}
+.botnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;cursor:pointer;color:var(--ink-muted);transition:color .15s}
+.botnav-item.active{color:var(--teal)}
+.botnav-ico{font-size:19px;line-height:1}
+.botnav-lbl{font-size:10px;font-weight:500}
+.pquote{background:var(--ink);color:var(--cream);border-radius:var(--r);padding:22px;margin:18px 0;position:relative;overflow:hidden}
+.pquote::before{content:'"';position:absolute;top:-20px;left:12px;font-family:'Playfair Display',serif;font-size:120px;color:rgba(255,255,255,.04);line-height:1}
+.pquote blockquote{font-family:'Playfair Display',serif;font-size:15px;font-style:italic;line-height:1.6;margin-bottom:10px;position:relative}
+.pquote cite{font-size:11px;color:#5eead4;font-style:normal}
+.divider{height:1px;background:var(--cream-dark);margin:18px 0}
+.setup-link{font-size:12px;color:var(--ink-muted);text-decoration:underline;margin-top:12px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <div class="tb-title">Purvi's Learning Hub</div>
+      <div class="tb-sub">Summer 2026 · Enloe HS</div>
+    </div>
+    <div class="tb-badge" id="tb-badge">Loading...</div>
+  </div>
+
+  <div class="view active" id="view-home">
+    <div class="hero">
+      <div class="hero-eye">Summer Learning Journey · 2026</div>
+      <h1>Hello, <em>Purvi</em>.</h1>
+      <div class="hero-desc">8 weeks toward your dream of becoming a psychiatrist. New weeks unlock automatically every Monday. One step at a time.</div>
+      <div class="hero-stats">
+        <div><div class="hs-num" id="hs-current">1</div><div class="hs-lbl">Current week</div></div>
+        <div><div class="hs-num" id="hs-unlocked">1</div><div class="hs-lbl">Unlocked</div></div>
+        <div><div class="hs-num">8</div><div class="hs-lbl">Total weeks</div></div>
+      </div>
+    </div>
+    <div class="progress-card">
+      <div class="pc-lbl"><span>Summer progress</span><strong id="pc-txt">Week 1 of 8</strong></div>
+      <div class="pc-track"><div class="pc-fill" id="pc-fill" style="width:0%"></div></div>
+    </div>
+    <div class="content">
+      <div class="sec-title">Your 8-week journey</div>
+      <div class="sec-sub">Topics are always visible. Daily details unlock each Monday. Tap a week to begin.</div>
+      <div class="wlist" id="week-list"></div>
+      <div class="pquote">
+        <blockquote>"To heal the mind, you must first understand the brain — and to understand the brain, you must study everything: chemistry, biology, behavior, and story."</blockquote>
+        <cite>— The foundation of psychiatry</cite>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-week"></div>
+
+  <div class="view" id="view-books">
+    <div class="hero">
+      <div class="hero-eye">Reading & Listening</div>
+      <h1>Books &amp; <em>Podcasts</em></h1>
+      <div class="hero-desc">Curated picks for the entrepreneurship weeks. Unlock as you reach each week.</div>
+    </div>
+    <div class="content" id="books-content"></div>
+  </div>
+
+  <div class="view" id="view-journal">
+    <div class="hero">
+      <div class="hero-eye">Weekly Reflection</div>
+      <h1>Your <em>Journal</em></h1>
+      <div class="hero-desc">Each week, complete the journal form. Your reflections are saved and your parent can review them.</div>
+    </div>
+    <div class="content">
+      <div class="info-box">📝 Submit this form at the end of each week. Your answers go to a private journal your parent can review remotely.</div>
+      <div class="form-card">
+        <h3 id="journal-title">Weekly Reflection — Week 1</h3>
+        <p>The form below is your weekly reflection. Save your work as you go — submit at week's end.</p>
+        <iframe class="form-frame" id="journal-iframe" src="" height="900" frameborder="0">Loading reflection form...</iframe>
+        <p style="margin-top:14px;font-size:11px;color:var(--ink-muted)">Form not loading? <a id="journal-direct" href="#" target="_blank" style="color:var(--teal)">Open it in a new tab</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="botnav">
+    <div class="botnav-item active" id="nav-home" onclick="go('home')">
+      <div class="botnav-ico">🏠</div><div class="botnav-lbl">Home</div>
+    </div>
+    <div class="botnav-item" id="nav-journal" onclick="go('journal')">
+      <div class="botnav-ico">📝</div><div class="botnav-lbl">Journal</div>
+    </div>
+    <div class="botnav-item" id="nav-books" onclick="go('books')">
+      <div class="botnav-ico">📚</div><div class="botnav-lbl">Resources</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — UPDATE THIS WITH YOUR FORM URL
+// ============================================================
+const CONFIG = {
+  // Paste your Google Form URL here after creating it (see SETUP_GUIDE.md)
+  // It looks like: https://docs.google.com/forms/d/e/XXXXXXX/viewform
+  journalFormUrl: "REPLACE_WITH_YOUR_FORM_URL",
+
+  // Week 1 starts Monday June 8, 2026. Each subsequent week unlocks 7 days later.
+  startDate: "2026-06-08"
+};
+
+function L(url,name,type){return{url:url,name:name,type:type}}
+
+const W=[
+{title:"Mathematical Thinking & Patterns",color:"#0d9488",cl:"#ccfbf1",ct:"#134e4a",tag:"Math",
+overview:"Spark curiosity in algebra, logic, probability and game theory through real-world phenomena. No textbook — puzzles, videos and simulations that build foundations for Enloe's Algebra 2/Pre-Calc.",
+days:[
+{day:"Monday",focus:"Patterns & the language of math",acts:[
+{t:"8:00–8:45",d:"Fibonacci in nature — sunflowers, shells, galaxies",links:[L("https://www.youtube.com/watch?v=wTlw7fNcO-0","Fibonacci: Nature's Code","yt")]},
+{t:"8:45–9:45",d:"Algebraic sequences puzzle set",links:[L("https://nrich.maths.org/","Nrich Maths Puzzles","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"3Blue1Brown: Essence of Calculus intro",links:[L("https://www.youtube.com/watch?v=WUvTyaaNkzM","Essence of Calculus","yt")]},
+{t:"11:00–11:30",d:"Reflection journal — what surprised you?",links:[]}],
+res:[L("https://www.youtube.com/watch?v=wTlw7fNcO-0","Fibonacci: Nature's Code","yt"),L("https://nrich.maths.org/","Nrich Maths Puzzles","web"),L("https://seeing-theory.brown.edu/","Seeing Theory (Interactive)","sim")]},
+{day:"Tuesday",focus:"The golden ratio & art",acts:[
+{t:"8:00–8:45",d:"Golden ratio in architecture — Parthenon, Notre Dame",links:[L("https://www.youtube.com/results?search_query=golden+ratio+architecture+explained","Golden Ratio: Architecture","yt")]},
+{t:"8:45–9:45",d:"Geometric artwork project — create your own",links:[L("https://www.geogebra.org/geometry","GeoGebra Geometry","sim")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"GeoGebra interactive exploration",links:[L("https://www.geogebra.org/","GeoGebra","sim")]},
+{t:"11:00–11:30",d:"Reflection: where did the ratio show up?",links:[]}],
+res:[L("https://www.geogebra.org/","GeoGebra","sim"),L("https://www.youtube.com/results?search_query=vi+hart+doodling+in+math","Vi Hart: Doodling in Math","yt"),L("https://www.youtube.com/results?search_query=golden+ratio+architecture+explained","Golden Ratio in Architecture","yt")]},
+{day:"Wednesday",focus:"Cryptography & prime numbers",acts:[
+{t:"8:00–8:30",d:"Caesar cipher — decode a secret message",links:[L("https://www.cryptoclub.org/","CryptoClub","web")]},
+{t:"8:30–9:30",d:"RSA basics + prime factorization",links:[L("https://www.youtube.com/results?search_query=how+RSA+encryption+works","How RSA Encryption Works","yt")]},
+{t:"9:30–10:00",d:"Online cipher challenge",links:[L("https://www.cryptoclub.org/","Cipher Challenges","web")]},
+{t:"10:15–11:00",d:"Art of Problem Solving puzzles",links:[L("https://artofproblemsolving.com/","Art of Problem Solving","web")]},
+{t:"11:00–11:30",d:"Weekly quiz — 5 questions",links:[]}],
+res:[L("https://www.cryptoclub.org/","CryptoClub","web"),L("https://www.youtube.com/results?search_query=how+RSA+encryption+works","How RSA Encryption Works","yt"),L("https://artofproblemsolving.com/","Art of Problem Solving","web")]},
+{day:"Thursday",focus:"Probability & decision-making",acts:[
+{t:"8:00–8:45",d:"Monty Hall problem — run the simulation 20 times",links:[L("https://seeing-theory.brown.edu/basic-probability/index.html","Monty Hall Simulation","sim")]},
+{t:"8:45–9:45",d:"Bayesian thinking — what does new evidence change?",links:[L("https://www.youtube.com/results?search_query=bayes+theorem+3blue1brown","Bayes Theorem — 3Blue1Brown","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Seeing Theory: probability visualizations",links:[L("https://seeing-theory.brown.edu/","Seeing Theory","sim")]},
+{t:"11:00–11:30",d:"Self-assessment check-in",links:[]}],
+res:[L("https://seeing-theory.brown.edu/","Seeing Theory (Interactive)","sim"),L("https://www.youtube.com/results?search_query=bayes+theorem+3blue1brown","Bayes Theorem — 3Blue1Brown","yt"),L("https://www.khanacademy.org/math/statistics-probability","Khan Academy: Probability","web")]},
+{day:"Friday",focus:"Game theory & strategy",acts:[
+{t:"8:00–8:45",d:"Prisoner's Dilemma — play it 5 rounds",links:[L("https://ncase.me/trust/","The Evolution of Trust (Game)","sim")]},
+{t:"8:45–9:45",d:"Nash equilibrium exploration",links:[L("https://www.youtube.com/results?search_query=game+theory+explained","Game Theory Explained","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Design your own strategy game",links:[]},
+{t:"11:00–11:30",d:"Week 1 full reflection",links:[]}],
+res:[L("https://ncase.me/trust/","The Evolution of Trust (Game)","sim"),L("https://www.youtube.com/results?search_query=game+theory+explained","Game Theory Explained","yt"),L("https://www.khanacademy.org/math/statistics-probability","Khan Academy: Probability","web")]}
+]},
+
+{title:"Biology + Chemistry of Life",color:"#059669",cl:"#d1fae5",ct:"#064e3b",tag:"Biology · Chem ×3",
+overview:"Cells, DNA, neuroscience, and the molecular chemistry of life. Chemistry is embedded on 3 days as the molecular 'why' behind biology. Directly feeds your psychiatry path.",
+days:[
+{day:"Monday",focus:"The living cell — you are made of stardust",acts:[
+{t:"8:00–8:30",d:"Harvard 'Inner Life of a Cell' film",links:[L("https://www.youtube.com/results?search_query=harvard+inner+life+of+a+cell","Inner Life of a Cell (Harvard)","yt")]},
+{t:"8:30–9:30",d:"Cell organelle scavenger hunt — find 10 organelles",links:[L("https://www.biointeractive.org/","HHMI BioInteractive","web")]},
+{t:"9:30–10:00",d:"Build a cell model (paper & craft supplies)",links:[]},
+{t:"10:15–11:00",d:"HHMI: cell size & scale interactive",links:[L("https://www.biointeractive.org/classroom-resources/cell-size-and-scale","Cell Size & Scale","sim")]},
+{t:"11:00–11:30",d:"Journal: what does it mean to be made of cells?",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=harvard+inner+life+of+a+cell","Inner Life of a Cell (Harvard)","yt"),L("https://www.biointeractive.org/","HHMI BioInteractive","web"),L("https://www.biointeractive.org/classroom-resources/cell-size-and-scale","Cell Size & Scale","sim")]},
+{day:"Tuesday",focus:"Atomic theory & molecules of life",chem:true,acts:[
+{t:"8:00–8:45",d:"CHEM: PhET atomic simulations — build atoms",links:[L("https://phet.colorado.edu/en/simulations/build-an-atom","Build an Atom — PhET","sim")]},
+{t:"8:45–9:45",d:"CHEM: how atoms become molecules — covalent bonds",links:[L("https://phet.colorado.edu/en/simulations/molecule-shapes","Molecule Shapes — PhET","sim")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Crash Course Chemistry: Matter",links:[L("https://www.youtube.com/results?search_query=crash+course+chemistry+matter","Crash Course Chemistry: Matter","yt")]},
+{t:"11:00–11:30",d:"Self-quiz: 5 atoms, 5 molecules",links:[]}],
+res:[L("https://phet.colorado.edu/en/simulations/build-an-atom","Build an Atom — PhET","sim"),L("https://www.youtube.com/results?search_query=crash+course+chemistry+matter","Crash Course Chemistry","yt"),L("https://www.compoundchem.com/","Compound Interest Blog","read")]},
+{day:"Wednesday",focus:"DNA & the chemistry of heredity",chem:true,acts:[
+{t:"8:00–9:00",d:"CHEM: DNA extraction kitchen experiment — strawberry!",links:[L("https://www.youtube.com/results?search_query=strawberry+DNA+extraction+at+home","DNA Extraction at Home","yt")]},
+{t:"9:00–9:45",d:"CHEM: protein folding & molecular bonds",links:[L("https://www.youtube.com/results?search_query=what+is+protein+folding","What is Protein Folding?","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–10:45",d:"Decode a protein sequence activity",links:[L("https://learn.genetics.utah.edu/","Learn.Genetics Utah","web")]},
+{t:"10:45–11:30",d:"Reflection: how does chemistry explain heredity?",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=strawberry+DNA+extraction+at+home","DNA Extraction at Home","yt"),L("https://learn.genetics.utah.edu/","Learn.Genetics — Utah","web"),L("https://www.nature.com/scitable","Scitable by Nature","read")]},
+{day:"Thursday",focus:"Neurotransmitter chemistry",chem:true,acts:[
+{t:"8:00–8:45",d:"CHEM: draw serotonin & dopamine structures",links:[L("https://www.compoundchem.com/","Compound Interest","read")]},
+{t:"8:45–9:45",d:"CHEM: how SSRIs work at the molecular level",links:[L("https://www.youtube.com/results?search_query=how+do+antidepressants+work+SSRI","How Do Antidepressants Work?","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Ethical debate: medicating adolescent depression?",links:[L("https://www.nimh.nih.gov/health/topics/mental-health-medications","NIMH: Mental Health Medications","read")]},
+{t:"11:00–11:30",d:"Weekly self-assessment",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=how+do+antidepressants+work+SSRI","How Do Antidepressants Work?","yt"),L("https://www.nimh.nih.gov/health/topics/mental-health-medications","NIMH: Mental Health Medications","read"),L("https://www.compoundchem.com/","Compound Interest","read")]},
+{day:"Friday",focus:"Genetics, the brain & psychiatry",acts:[
+{t:"8:00–8:45",d:"Genetics in mental illness — overview",links:[L("https://www.youtube.com/results?search_query=genetics+and+mental+illness","Genetics & Mental Illness","yt")]},
+{t:"8:45–9:45",d:"Read: NIMH summary on depression",links:[L("https://www.nimh.nih.gov/health/topics/depression","NIMH: Depression","read")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write: how will this week inform my career?",links:[]},
+{t:"11:00–11:30",d:"Week 2 full reflection",links:[]}],
+res:[L("https://www.nimh.nih.gov/health/topics/depression","NIMH: Depression Research","read"),L("https://www.brainfacts.org/","BrainFacts.org","web"),L("https://www.youtube.com/results?search_query=genetics+and+mental+illness","Genetics & Mental Illness","yt")]}
+]},
+
+{title:"The Science of the Mind",color:"#be185d",cl:"#fce7f3",ct:"#831843",tag:"Psychology",
+overview:"A deep dive into your future profession. Psychology's history, major theories, mental health stigma, the adolescent brain, research methods, and what it means to be a psychiatrist.",
+days:[
+{day:"Monday",focus:"How psychology became a science",acts:[
+{t:"8:00–8:45",d:"Timeline: Freud → fMRI",links:[L("https://www.youtube.com/results?search_query=history+of+psychology+crash+course","History of Psychology","yt")]},
+{t:"8:45–9:45",d:"Read: Oliver Sacks excerpt",links:[L("https://www.oliversacks.com/books-by-oliver-sacks/the-man-who-mistook-his-wife-for-a-hat/","Oliver Sacks Book","read")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Schools of thought chart",links:[L("https://www.youtube.com/results?search_query=crash+course+psychology+history","Crash Course Psychology #1","yt")]},
+{t:"11:00–11:30",d:"Journal: which school resonates with you?",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=crash+course+psychology","Crash Course Psychology","yt"),L("https://www.apa.org/topics","APA: Psychology Topics","web"),L("https://www.oliversacks.com/","Oliver Sacks Foundation","read")]},
+{day:"Tuesday",focus:"Mental health disorders & stigma",acts:[
+{t:"8:00–8:45",d:"DSM-5 overview (non-clinical)",links:[L("https://www.nami.org/about-mental-illness/mental-health-conditions/","NAMI: Conditions","web")]},
+{t:"8:45–9:45",d:"Two anxiety case studies — analyze",links:[L("https://www.nami.org/about-mental-illness/mental-health-conditions/anxiety-disorders/","NAMI: Anxiety Disorders","read")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Watch: mental health stigma talk",links:[L("https://www.youtube.com/results?search_query=TED+mental+health+stigma","Mental Health Stigma — TED","yt")]},
+{t:"11:00–11:30",d:"Reflection: how to reduce stigma in schools?",links:[]}],
+res:[L("https://www.nami.org/","NAMI.org","web"),L("https://www.nimh.nih.gov/health/topics","NIMH: Conditions","web"),L("https://www.youtube.com/results?search_query=TED+mental+health+stigma","Mental Health Stigma — TED","yt")]},
+{day:"Wednesday",focus:"The adolescent brain",acts:[
+{t:"8:00–8:45",d:"Neuroscience of the teenage brain",links:[L("https://www.youtube.com/results?search_query=teenage+brain+TED+talk","The Teenage Brain — TED","yt")]},
+{t:"8:45–9:45",d:"Social media & mental health — two views",links:[L("https://www.youtube.com/results?search_query=jonathan+haidt+TED+teen+girls","Jonathan Haidt — TED","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Design a peer awareness campaign",links:[L("https://www.canva.com/","Canva (Design Tool)","web")]},
+{t:"11:00–11:30",d:"Self-assessment check-in",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=teenage+brain+TED+talk","The Teenage Brain — TED","yt"),L("https://developingchild.harvard.edu/science/key-concepts/brain-architecture/","Harvard: Brain Architecture","read"),L("https://www.youtube.com/results?search_query=jonathan+haidt+TED+teen+girls","Jonathan Haidt — TED","yt")]},
+{day:"Thursday",focus:"Research methods in psychiatry",acts:[
+{t:"8:00–8:45",d:"Clinical trial design — phases 1–4",links:[L("https://www.youtube.com/results?search_query=clinical+trials+explained","Clinical Trials Explained","yt")]},
+{t:"8:45–9:45",d:"Analyze a simplified study",links:[L("https://www.cochrane.org/news/plain-language-summaries","Cochrane Summaries","read")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Spot biases: confirmation, p-hacking",links:[L("https://www.youtube.com/results?search_query=cognitive+biases+explained","Cognitive Biases","yt")]},
+{t:"11:00–11:30",d:"Weekly quiz",links:[]}],
+res:[L("https://clinicaltrials.gov/","ClinicalTrials.gov","web"),L("https://www.cochrane.org/news/plain-language-summaries","Cochrane Summaries","read"),L("https://www.youtube.com/results?search_query=cognitive+biases+explained","Cognitive Biases","yt")]},
+{day:"Friday",focus:"A day in the life: psychiatrist",acts:[
+{t:"8:00–8:45",d:"Watch: psychiatrist career interviews",links:[L("https://www.youtube.com/results?search_query=day+in+the+life+psychiatrist","Day in the Life: Psychiatrist","yt")]},
+{t:"8:45–9:45",d:"Compare psychiatry vs psychology vs therapy",links:[L("https://www.apa.org/topics/psychotherapy/understanding","APA: Understanding Therapy","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write: my path to psychiatry essay",links:[]},
+{t:"11:00–11:30",d:"Week 3 full reflection",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=day+in+the+life+psychiatrist","Day in the Life: Psychiatrist","yt"),L("https://students-residents.aamc.org/","AAMC: Aspiring Docs","web"),L("https://www.apa.org/topics","APA: Topics","web")]}
+]},
+
+{title:"Entrepreneurship I — Foundations & Mindset",color:"#7c3aed",cl:"#ede9fe",ct:"#4c1d95",tag:"Business",
+overview:"Week 1 of 3. Build the entrepreneur's mindset: opportunity recognition, problem-first thinking, the Business Model Canvas, and lean startup thinking.",
+days:[
+{day:"Monday",focus:"What entrepreneurs actually do",acts:[
+{t:"8:00–8:45",d:"5 founder failure stories — before success",links:[L("https://www.youtube.com/results?search_query=startup+failure+stories","Startup Failure Stories","yt")]},
+{t:"8:45–9:30",d:"Entrepreneur vs employee mindset",links:[L("https://www.youtube.com/results?search_query=simon+sinek+start+with+why","Simon Sinek: Start With Why","yt")]},
+{t:"9:30–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Listen: 'How I Built This'",links:[L("https://www.npr.org/series/490248027/how-i-built-this","How I Built This (NPR)","pod")]},
+{t:"11:00–11:30",d:"Journal: what problem do I want to solve?",links:[]}],
+res:[L("https://www.npr.org/series/490248027/how-i-built-this","How I Built This (NPR)","pod"),L("https://www.youtube.com/results?search_query=simon+sinek+start+with+why","Simon Sinek: Start With Why","yt"),L("https://brenebrown.com/podcast-show/dare-to-lead/","Dare to Lead Podcast","pod")]},
+{day:"Tuesday",focus:"Spotting opportunities",acts:[
+{t:"8:00–8:45",d:"Jobs-to-be-done framework",links:[L("https://www.youtube.com/results?search_query=jobs+to+be+done+clayton+christensen","Jobs to Be Done","yt")]},
+{t:"8:45–9:45",d:"Observe 3 problems in your community",links:[]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write 5 opportunity statements",links:[L("https://www.ideou.com/blogs/inspiration/what-is-design-thinking","IDEO Design Thinking","read")]},
+{t:"11:00–11:30",d:"Reflection: which opportunity excites you?",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=jobs+to+be+done+clayton+christensen","Jobs to Be Done","yt"),L("https://www.ideou.com/blogs/inspiration/what-is-design-thinking","IDEO Design Thinking","read"),L("https://www.ycombinator.com/library","Y Combinator Library","web")]},
+{day:"Wednesday",focus:"Business model canvas",acts:[
+{t:"8:00–8:45",d:"Business Model Canvas — 9 blocks",links:[L("https://www.youtube.com/results?search_query=business+model+canvas+explained","Business Model Canvas","yt")]},
+{t:"8:45–9:45",d:"Apply BMC to Netflix",links:[L("https://www.strategyzer.com/library/the-business-model-canvas","Strategyzer BMC Template","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Apply BMC to your own idea",links:[L("https://www.canva.com/templates/?query=business-model-canvas","Canva BMC Template","web")]},
+{t:"11:00–11:30",d:"Weekly quiz",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=business+model+canvas+explained","BMC Explained","yt"),L("https://www.strategyzer.com/library/the-business-model-canvas","Strategyzer BMC Template","web"),L("https://leanstack.com/lean-canvas","Lean Canvas","web")]},
+{day:"Thursday",focus:"Customers & value propositions",acts:[
+{t:"8:00–8:45",d:"Value proposition design",links:[L("https://www.youtube.com/results?search_query=value+proposition+canvas","Value Proposition Canvas","yt")]},
+{t:"8:45–9:45",d:"Create 2 customer personas",links:[L("https://www.hubspot.com/make-my-persona","HubSpot Persona Builder","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Validate: 3 informal conversations",links:[]},
+{t:"11:00–11:30",d:"Self-assessment check-in",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=value+proposition+canvas","Value Proposition Canvas","yt"),L("https://www.hubspot.com/make-my-persona","HubSpot Persona Builder","web"),L("https://review.firstround.com/","First Round Review","read")]},
+{day:"Friday",focus:"Lean startup thinking",acts:[
+{t:"8:00–8:45",d:"Build–Measure–Learn loop",links:[L("https://www.youtube.com/results?search_query=lean+startup+build+measure+learn","The Lean Startup","yt")]},
+{t:"8:45–9:45",d:"Case study: Instagram's pivot",links:[L("https://www.youtube.com/results?search_query=instagram+pivot+from+burbn","Instagram Pivot Story","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"What is your riskiest assumption?",links:[]},
+{t:"11:00–11:30",d:"Week 4 full reflection",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=lean+startup+build+measure+learn","The Lean Startup","yt"),L("https://review.firstround.com/","First Round Review","read"),L("https://www.startupschool.org/","Y Combinator Startup School","web")]}
+]},
+
+{title:"Integrated Sciences + Environmental Chemistry",color:"#d97706",cl:"#fef3c7",ct:"#78350f",tag:"Integrated · Chem ×3",
+overview:"Tie math, biology and chemistry together through epidemiology, biostatistics and data science. Chemistry returns for 3 days: environmental chemistry, food chemistry, and pharmacokinetics.",
+days:[
+{day:"Monday",focus:"Environmental chemistry & health",chem:true,acts:[
+{t:"8:00–8:45",d:"CHEM: plastics & ocean chemistry",links:[L("https://www.youtube.com/results?search_query=plastic+pollution+chemistry","Plastic Pollution Chemistry","yt")]},
+{t:"8:45–9:45",d:"CHEM: water quality testing experiment",links:[L("https://www.epa.gov/students","EPA Student Resources","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"How pollution causes neurological disease",links:[L("https://www.niehs.nih.gov/health/topics/agents/air-pollution","NIEHS: Air Pollution & Health","read")]},
+{t:"11:00–11:30",d:"Journal: what would you test in local water?",links:[]}],
+res:[L("https://www.niehs.nih.gov/health/topics/agents/air-pollution","NIEHS: Pollution & Health","web"),L("https://www.epa.gov/students","EPA Student Resources","web"),L("https://ourworldindata.org/air-pollution","Our World in Data: Pollution","web")]},
+{day:"Tuesday",focus:"Food chemistry & nutrition science",chem:true,acts:[
+{t:"8:00–8:45",d:"CHEM: analyze nutrition labels molecularly",links:[L("https://www.compoundchem.com/","Compound Interest: Food Chemistry","read")]},
+{t:"8:45–9:45",d:"CHEM: the story of aspirin",links:[L("https://www.youtube.com/results?search_query=history+of+aspirin+chemistry","The History of Aspirin","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"SciShow: drug chemistry",links:[L("https://www.youtube.com/c/SciShow","SciShow (YouTube)","yt")]},
+{t:"11:00–11:30",d:"Self-quiz",links:[]}],
+res:[L("https://www.compoundchem.com/","Compound Interest: Food Chemistry","read"),L("https://www.youtube.com/c/SciShow","SciShow","yt"),L("https://www.youtube.com/results?search_query=history+of+aspirin+chemistry","History of Aspirin","yt")]},
+{day:"Wednesday",focus:"Pharmacokinetics — drugs in the body",chem:true,acts:[
+{t:"8:00–8:45",d:"CHEM: absorption, metabolism, excretion",links:[L("https://www.youtube.com/results?search_query=pharmacokinetics+basics","Pharmacokinetics Basics","yt")]},
+{t:"8:45–9:45",d:"CHEM: half-life math",links:[L("https://phet.colorado.edu/en/simulations/radioactive-dating-game","Half-Life Simulation — PhET","sim")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Design a safe dosing schedule",links:[L("https://www.nimh.nih.gov/health/topics/mental-health-medications","NIMH: Medications","read")]},
+{t:"11:00–11:30",d:"Reflection: connect to psychiatric meds",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=pharmacokinetics+basics","Pharmacokinetics Basics","yt"),L("https://phet.colorado.edu/en/simulations/radioactive-dating-game","Half-Life Simulation — PhET","sim"),L("https://www.nimh.nih.gov/health/topics/mental-health-medications","NIMH: Medications","web")]},
+{day:"Thursday",focus:"Epidemiology & disease math",acts:[
+{t:"8:00–8:45",d:"R₀ values and pandemic math",links:[L("https://www.youtube.com/results?search_query=3blue1brown+simulating+epidemic","Simulating an Epidemic — 3B1B","yt")]},
+{t:"8:45–9:45",d:"Simulate disease spread",links:[L("https://www.youtube.com/results?search_query=exponential+growth+epidemics+3blue1brown","Exponential Growth & Epidemics","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Read: COVID modeling summary",links:[L("https://ourworldindata.org/coronavirus","Our World in Data: COVID","web")]},
+{t:"11:00–11:30",d:"Weekly self-assessment",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=3blue1brown+simulating+epidemic","Simulating an Epidemic — 3B1B","yt"),L("https://www.cdc.gov/careers/students.html","CDC: Student Resources","web"),L("https://ourworldindata.org/","Our World in Data","web")]},
+{day:"Friday",focus:"Statistics in medicine",acts:[
+{t:"8:00–8:45",d:"P-values & confidence intervals",links:[L("https://www.youtube.com/results?search_query=p+values+clearly+explained","P-values Clearly Explained","yt")]},
+{t:"8:45–9:45",d:"Evaluate a clinical trial result",links:[L("https://www.cochrane.org/news/plain-language-summaries","Cochrane Summaries","read")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Spot 5 misleading health statistics",links:[L("https://www.youtube.com/results?search_query=how+to+spot+bad+statistics","How to Spot Bad Statistics","yt")]},
+{t:"11:00–11:30",d:"Week 5 full reflection",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=p+values+clearly+explained","P-values Explained","yt"),L("https://www.youtube.com/results?search_query=how+to+spot+bad+statistics","How to Spot Bad Statistics","yt"),L("https://www.cochrane.org/news/plain-language-summaries","Cochrane Summaries","read")]}
+]},
+
+{title:"Entrepreneurship II — Health Tech & Social Enterprise",color:"#7c3aed",cl:"#ede9fe",ct:"#4c1d95",tag:"Business · Psychology",
+overview:"Week 2 of 3. The intersection of entrepreneurship and mental health. How BetterHelp, Headspace and Calm were built. Design a mental health product. Nonprofit vs for-profit vs B-corp.",
+days:[
+{day:"Monday",focus:"Health tech entrepreneurship",acts:[
+{t:"8:00–8:45",d:"Case studies: BetterHelp, Calm, Headspace",links:[L("https://www.youtube.com/results?search_query=how+headspace+was+built+TED","How Headspace Was Built — TED","yt")]},
+{t:"8:45–9:30",d:"Health tech market landscape",links:[L("https://www.acquired.fm/","Acquired Podcast","pod")]},
+{t:"9:30–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Listen: Acquired — a health company",links:[L("https://www.acquired.fm/episodes","Acquired Episodes","pod")]},
+{t:"11:00–11:30",d:"Journal: what gap would you address?",links:[]}],
+res:[L("https://www.acquired.fm/","Acquired Podcast","pod"),L("https://www.youtube.com/results?search_query=how+headspace+was+built","How Headspace Was Built","yt"),L("https://www.headspace.com/about-us","Headspace: Our Story","read")]},
+{day:"Tuesday",focus:"Design your mental health product",acts:[
+{t:"8:00–8:45",d:"User research & empathy mapping",links:[L("https://www.nngroup.com/articles/empathy-mapping/","Empathy Mapping — NN Group","read")]},
+{t:"8:45–9:45",d:"Sketch your mental health app/service",links:[L("https://www.figma.com/","Figma (Free)","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write 5 user stories",links:[]},
+{t:"11:00–11:30",d:"Reflection: what would 14-year-old you need?",links:[]}],
+res:[L("https://www.nngroup.com/articles/empathy-mapping/","Empathy Mapping — NN Group","read"),L("https://www.figma.com/","Figma — Free Design Tool","web"),L("https://www.ideou.com/pages/design-thinking","IDEO Design Thinking","read")]},
+{day:"Wednesday",focus:"Nonprofit vs for-profit vs B-corp",acts:[
+{t:"8:00–8:45",d:"Legal structures — 4 types",links:[L("https://www.youtube.com/results?search_query=nonprofit+vs+for+profit+explained","Nonprofit vs For-Profit","yt")]},
+{t:"8:45–9:45",d:"Read a B-corp impact report",links:[L("https://www.bcorporation.net/en-us/","B Lab: What is a B Corp?","read")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Choose a structure & justify it",links:[]},
+{t:"11:00–11:30",d:"Quiz",links:[]}],
+res:[L("https://www.bcorporation.net/en-us/","B Lab: What is a B Corp","web"),L("https://www.youtube.com/results?search_query=nonprofit+vs+for+profit+explained","Nonprofit vs For-Profit","yt"),L("https://www.ashoka.org/en-us","Ashoka: Social Entrepreneurs","read")]},
+{day:"Thursday",focus:"Revenue models & financial basics",acts:[
+{t:"8:00–8:45",d:"6 health startup revenue models",links:[L("https://www.youtube.com/results?search_query=startup+business+models+explained","Startup Business Models","yt")]},
+{t:"8:45–9:45",d:"Analyze a simplified startup P&L",links:[L("https://www.khanacademy.org/economics-finance-domain/core-finance","Khan Academy: Finance","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Build a 1-page financial model",links:[L("https://www.startupschool.org/","Y Combinator Startup School","web")]},
+{t:"11:00–11:30",d:"Self-assessment check-in",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=startup+business+models+explained","Startup Business Models","yt"),L("https://www.startupschool.org/","Y Combinator Startup School","web"),L("https://www.khanacademy.org/economics-finance-domain/core-finance","Khan Academy: Finance","web")]},
+{day:"Friday",focus:"Marketing a mental health brand",acts:[
+{t:"8:00–8:45",d:"Seth Godin: 'This is Marketing'",links:[L("https://seths.blog/","Seth Godin's Blog","read")]},
+{t:"8:45–9:45",d:"Ethical social media strategy",links:[L("https://www.canva.com/","Canva for Brand Design","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write your brand mission statement",links:[]},
+{t:"11:00–11:30",d:"Week 6 full reflection",links:[]}],
+res:[L("https://seths.blog/","Seth Godin's Blog","read"),L("https://www.canva.com/","Canva","web"),L("https://www.youtube.com/results?search_query=simon+sinek+start+with+why","Simon Sinek: Start With Why","yt")]}
+]},
+
+{title:"Entrepreneurship III — Pitch, Speak & Lead",color:"#7c3aed",cl:"#ede9fe",ct:"#4c1d95",tag:"Business · Speaking",
+overview:"Week 3 of 3. Build your pitch deck, master persuasion science, practice storytelling, and deliver a live investor pitch on Friday. Public speaking taught as an entrepreneurial tool.",
+days:[
+{day:"Monday",focus:"The science of persuasion",acts:[
+{t:"8:00–8:45",d:"Cialdini's 6 principles of influence",links:[L("https://www.youtube.com/results?search_query=cialdini+6+principles+influence","Cialdini's 6 Principles","yt")]},
+{t:"8:45–9:45",d:"Analyze 3 Shark Tank pitches",links:[L("https://www.youtube.com/results?search_query=best+shark+tank+pitches","Shark Tank Best Pitches","yt")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Rhetorical devices: ethos, pathos, logos",links:[L("https://www.youtube.com/results?search_query=ethos+pathos+logos+explained","Ethos Pathos Logos","yt")]},
+{t:"11:00–11:30",d:"Journal: your persuasion style?",links:[]}],
+res:[L("https://www.youtube.com/results?search_query=cialdini+6+principles+influence","Cialdini's 6 Principles","yt"),L("https://mastersofscale.com/","Masters of Scale Podcast","pod"),L("https://www.ted.com/topics/storytelling","TED: Storytelling","yt")]},
+{day:"Tuesday",focus:"Build your pitch deck",acts:[
+{t:"8:00–8:45",d:"Y Combinator pitch framework",links:[L("https://www.youtube.com/results?search_query=Y+Combinator+how+to+pitch","YC: How to Pitch","yt")]},
+{t:"8:45–10:15",d:"Build your 8-slide pitch deck",links:[L("https://www.canva.com/presentations/","Canva Presentations","web"),L("https://slides.google.com/","Google Slides","web")]},
+{t:"10:15–10:30",d:"Break",links:[]},
+{t:"10:30–11:15",d:"Record pitch run #1",links:[]},
+{t:"11:15–11:30",d:"Note 3 things to improve",links:[]}],
+res:[L("https://www.ycombinator.com/library","Y Combinator Library","web"),L("https://www.canva.com/presentations/","Canva Presentations","web"),L("https://slides.google.com/","Google Slides","web")]},
+{day:"Wednesday",focus:"Storytelling & founder narrative",acts:[
+{t:"8:00–8:45",d:"The hero's journey in pitches",links:[L("https://www.youtube.com/results?search_query=hero+journey+explained","The Hero's Journey","yt")]},
+{t:"8:45–9:45",d:"Write your founder origin story",links:[]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Deliver story to camera — 3 takes",links:[]},
+{t:"11:00–11:30",d:"Self-assess with speaking rubric",links:[L("https://www.toastmasters.org/resources/public-speaking-tips","Toastmasters Tips","read")]}],
+res:[L("https://www.youtube.com/results?search_query=hero+journey+explained","The Hero's Journey","yt"),L("https://www.ted.com/talks/andrew_stanton_the_clues_to_a_great_story","TED: Clues to a Great Story","yt"),L("https://www.toastmasters.org/resources/public-speaking-tips","Toastmasters Tips","read")]},
+{day:"Thursday",focus:"Debate & tough questions",acts:[
+{t:"8:00–8:45",d:"Answering questions you don't know",links:[L("https://www.youtube.com/results?search_query=speak+under+pressure+TED","Speak Under Pressure — TED","yt")]},
+{t:"8:45–9:45",d:"Debate: public mental health funding",links:[]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Listen: The Pitch — investor Q&A",links:[L("https://gimletmedia.com/shows/the-pitch","The Pitch Podcast","pod")]},
+{t:"11:00–11:30",d:"Weekly self-assessment",links:[]}],
+res:[L("https://gimletmedia.com/shows/the-pitch","The Pitch Podcast","pod"),L("https://www.youtube.com/results?search_query=speak+under+pressure+TED","Speak Under Pressure — TED","yt"),L("https://www.toastmasters.org/resources/public-speaking-tips","Toastmasters","read")]},
+{day:"Friday",focus:"Pitch Day",acts:[
+{t:"8:00–9:00",d:"Final prep — solo practice run",links:[]},
+{t:"9:00–9:30",d:"Deliver 4-minute pitch to family",links:[]},
+{t:"9:30–10:00",d:"Q&A — 10 minutes",links:[]},
+{t:"10:15–11:00",d:"Revise deck based on feedback",links:[L("https://www.canva.com/presentations/","Canva","web")]},
+{t:"11:00–11:30",d:"Week 7 reflection — how far you've come",links:[]}],
+res:[L("https://www.ycombinator.com/library","YC Library","web"),L("https://mastersofscale.com/","Masters of Scale","pod"),L("https://www.toastmasters.org/resources/public-speaking-tips","Toastmasters","read")]}
+]},
+
+{title:"Capstone — Purvi's Summer Project",color:"#0369a1",cl:"#e0f2fe",ct:"#0c4a6e",tag:"Capstone",
+overview:"Synthesis and celebration. A 10-minute presentation weaving a science-backed mental health case, a business model for a solution, and a public health call to action. All 8 weeks converge here.",
+days:[
+{day:"Monday",focus:"Project planning & topic selection",acts:[
+{t:"8:00–8:45",d:"Choose your capstone topic",links:[]},
+{t:"8:45–9:45",d:"Build your project outline",links:[L("https://docs.google.com/document/","Google Docs","web")]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Identify 3 evidence sources",links:[L("https://pubmed.ncbi.nlm.nih.gov/","PubMed","web"),L("https://scholar.google.com/","Google Scholar","web")]},
+{t:"11:00–11:30",d:"Write your goal statement",links:[]}],
+res:[L("https://pubmed.ncbi.nlm.nih.gov/","PubMed","web"),L("https://scholar.google.com/","Google Scholar","web"),L("https://www.nimh.nih.gov/news/research-highlights","NIMH Research Highlights","read")]},
+{day:"Tuesday",focus:"Deep research & evidence",acts:[
+{t:"8:00–9:30",d:"Research sprint — 3+ sources",links:[L("https://pubmed.ncbi.nlm.nih.gov/","PubMed","web"),L("https://www.nimh.nih.gov/","NIMH","web")]},
+{t:"9:30–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write your evidence summary",links:[]},
+{t:"11:00–11:30",d:"Share findings with a parent",links:[]}],
+res:[L("https://pubmed.ncbi.nlm.nih.gov/","PubMed","web"),L("https://www.nimh.nih.gov/","NIMH","web"),L("https://ourworldindata.org/","Our World in Data","web")]},
+{day:"Wednesday",focus:"Build the presentation",acts:[
+{t:"8:00–9:30",d:"Design slides & visual aids",links:[L("https://www.canva.com/presentations/","Canva","web"),L("https://slides.google.com/","Google Slides","web")]},
+{t:"9:30–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Write speaking notes per slide",links:[]},
+{t:"11:00–11:30",d:"Practice run #1 — time yourself",links:[]}],
+res:[L("https://www.canva.com/","Canva","web"),L("https://slides.google.com/","Google Slides","web"),L("https://www.ted.com/playlists/574/how_to_make_a_great_presentation","TED: Great Presentations","yt")]},
+{day:"Thursday",focus:"Rehearsal & polish",acts:[
+{t:"8:00–8:45",d:"Full run-through with family",links:[]},
+{t:"8:45–9:45",d:"Revise slides and delivery",links:[]},
+{t:"9:45–10:00",d:"Break",links:[]},
+{t:"10:15–11:00",d:"Full-summer self-assessment",links:[]},
+{t:"11:00–11:30",d:"Letter to your future self",links:[]}],
+res:[L("https://www.toastmasters.org/resources/public-speaking-tips","Toastmasters Tips","read"),L("https://enloehs.wcpss.net/","Enloe High School","web")]},
+{day:"Friday",focus:"Capstone Presentation Day",acts:[
+{t:"8:00–8:30",d:"Final prep — breathe, review",links:[]},
+{t:"8:30–9:00",d:"Deliver 10-minute presentation",links:[]},
+{t:"9:00–9:20",d:"Q&A — 20 minutes",links:[]},
+{t:"9:20–10:00",d:"Celebrate — you did it!",links:[]},
+{t:"10:15–11:00",d:"Summer portfolio self-assessment",links:[]},
+{t:"11:00–11:30",d:"Plan for Day 1 at Enloe!",links:[L("https://enloehs.wcpss.net/","Enloe High School","web")]}],
+res:[L("https://enloehs.wcpss.net/","Enloe Magnet High School","web"),L("https://www.nimh.nih.gov/","NIMH","web")]}
+]}
+];
+
+const TYPE_META={
+  yt:{ico:'▶',cls:'al-yt',bg:'#fee2e2',fg:'#991b1b',lbl:'YouTube'},
+  web:{ico:'↗',cls:'al-web',bg:'#e0f2fe',fg:'#0369a1',lbl:'Website'},
+  sim:{ico:'⚙',cls:'al-sim',bg:'#ede9fe',fg:'#5b21b6',lbl:'Simulation'},
+  pod:{ico:'🎙',cls:'al-pod',bg:'#fef3c7',fg:'#92400e',lbl:'Podcast'},
+  read:{ico:'📖',cls:'al-read',bg:'#d1fae5',fg:'#065f46',lbl:'Article'}
+};
+
+// ============================================================
+// DATE-BASED GATING (works identically on every device)
+// ============================================================
+function currentWeekIndex(){
+  const start = new Date(CONFIG.startDate + "T00:00:00");
+  const now = new Date();
+  const diffDays = Math.floor((now - start) / (1000*60*60*24));
+  if(diffDays < 0) return -1; // before start
+  return Math.min(Math.floor(diffDays / 7), 7);
+}
+function weekDateRange(wi){
+  const start = new Date(CONFIG.startDate + "T00:00:00");
+  start.setDate(start.getDate() + wi*7);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 4); // Mon-Fri
+  const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return fmt(start) + " – " + fmt(end);
+}
+function isUnlocked(wi){return wi <= currentWeekIndex()}
+function isPast(wi){return wi < currentWeekIndex()}
+function isCurrent(wi){return wi === currentWeekIndex()}
+
+function init(){
+  renderHome();
+  renderBooks();
+  setupJournal();
+  window.scrollTo(0,0);
+}
+
+function renderHome(){
+  const cur = Math.max(0, currentWeekIndex());
+  const unlk = cur + 1;
+  document.getElementById('hs-current').textContent = currentWeekIndex() < 0 ? '—' : (cur + 1);
+  document.getElementById('hs-unlocked').textContent = Math.min(unlk, 8);
+  document.getElementById('pc-txt').textContent = currentWeekIndex() < 0 ? 'Starts June 8' : ('Week ' + (cur+1) + ' of 8');
+  document.getElementById('pc-fill').style.width = Math.round(Math.min(unlk,8)/8*100) + '%';
+
+  if(currentWeekIndex() < 0){
+    document.getElementById('tb-badge').textContent = 'Starts June 8';
+  } else if(cur >= 7){
+    document.getElementById('tb-badge').textContent = 'Final week!';
+  } else {
+    document.getElementById('tb-badge').textContent = 'Week ' + (cur+1) + ' active';
+  }
+
+  document.getElementById('week-list').innerHTML = W.map((w,i) => {
+    const unlk = isUnlocked(i);
+    const past = isPast(i);
+    const curr = isCurrent(i);
+    const statusCls = past ? 'past' : unlk ? 'open' : 'lock';
+    const statusIco = past ? '✓' : unlk ? '→' : '🔒';
+    return `<div class="wcard ${unlk?'unlocked':'locked'} ${curr?'current':''}" style="--wc:${w.color}" ${unlk?`onclick="openWeek(${i})"`:''}>
+      <div class="wc-top">
+        <div style="flex:1;min-width:0">
+          <div class="wc-num">WEEK ${i+1} · ${weekDateRange(i)}</div>
+          <div class="wc-title">${w.title}</div>
+        </div>
+        <div class="wc-status ${statusCls}">${statusIco}</div>
+      </div>
+      <div class="wc-desc">${unlk?w.overview:'Daily plan and resources unlock the week of ' + weekDateRange(i) + '.'}</div>
+      <div class="wc-tags"><span class="tag" style="background:${w.cl};color:${w.ct}">${w.tag}</span>${curr?'<span class="tag" style="background:var(--teal);color:#fff">Current</span>':''}${past?'<span class="tag" style="background:var(--teal-l);color:var(--teal)">Past week</span>':''}</div>
+      ${!unlk?`<div class="wc-lockmsg">🔒 Unlocks ${weekDateRange(i).split('–')[0].trim()}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openWeek(wi){
+  if(!isUnlocked(wi)) return;
+  const w = W[wi];
+  const v = document.getElementById('view-week');
+  v.innerHTML = `
+    <div class="wd-hero" style="background:${w.cl}">
+      <div class="wd-back" onclick="go('home')">← Back to all weeks</div>
+      <div class="wd-badges">
+        <span class="tag" style="background:${w.color};color:#fff">WEEK ${wi+1}</span>
+        <span class="tag" style="background:rgba(0,0,0,.08);color:${w.ct}">${w.tag}</span>
+        ${isCurrent(wi)?'<span class="tag" style="background:var(--teal);color:#fff">This week</span>':''}
+        ${isPast(wi)?'<span class="tag" style="background:#fff;color:var(--teal)">✓ Past</span>':''}
+      </div>
+      <div class="wd-title" style="color:${w.ct}">${w.title}</div>
+      <div class="wd-overview">${w.overview}</div>
+      <div class="wd-dates">📅 ${weekDateRange(wi)}</div>
+    </div>
+    <div class="tabbar">
+      <div class="tab active" onclick="wtab(${wi},'sched',this)">Daily Plan</div>
+      <div class="tab" onclick="wtab(${wi},'res',this)">Links</div>
+    </div>
+    <div class="tabcontent active" id="wt-sched">
+      ${w.days.map((d,di) => `
+        <div class="daycard" id="day-${wi}-${di}">
+          <div class="daycard-hdr" onclick="toggleDay(${wi},${di})">
+            <div class="daybadge" style="background:${w.cl};color:${w.ct}">${d.day.substring(0,3).toUpperCase()}</div>
+            <div class="daycard-ttl"><h4>${d.focus}${d.chem?' <span style="background:#fef3c7;color:#92400e;font-size:9px;padding:1px 6px;border-radius:99px">chem</span>':''}</h4><p>${d.day} · ${d.acts.length} activities</p></div>
+            <div class="daychev">⌄</div>
+          </div>
+          <div class="daycard-body">
+            ${d.acts.map(a => `
+              <div class="act-item">
+                <div class="act-row"><span class="act-time">${a.t}</span><span class="act-desc">${a.d}</span></div>
+                ${a.links && a.links.length ? `<div class="act-links">${a.links.map(l => linkBtn(l)).join('')}</div>` : ''}
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+      <div class="banner">
+        <h4>📝 Don't forget your reflection!</h4>
+        <p>At the end of the week, fill in your weekly journal. Your parent reviews it remotely to support you.</p>
+        <button class="btn btn-teal" onclick="go('journal')">Open weekly journal →</button>
+      </div>
+    </div>
+    <div class="tabcontent" id="wt-res">
+      <div style="padding-bottom:10px">
+      ${w.days.map(d => `
+        <div class="res-day">
+          <div class="res-day-ttl" style="color:${w.ct}">${d.day}: ${d.focus}</div>
+          ${(d.res||[]).map(r => resLinkRow(r)).join('')}
+        </div>`).join('')}
+      </div>
+    </div>
+  `;
+  go('week', true);
+}
+
+function linkBtn(l){const m=TYPE_META[l.type]||TYPE_META.web;return `<a class="act-link ${m.cls}" href="${l.url}" target="_blank" rel="noopener">${m.ico} ${l.name}</a>`}
+function resLinkRow(r){const m=TYPE_META[r.type]||TYPE_META.web;return `<a class="res-link" href="${r.url}" target="_blank" rel="noopener"><span class="res-ico" style="background:${m.bg};color:${m.fg}">${m.ico}</span><span class="res-txt">${r.name}</span><span class="res-type" style="background:${m.bg};color:${m.fg}">${m.lbl}</span></a>`}
+
+function setupJournal(){
+  const iframe = document.getElementById('journal-iframe');
+  const direct = document.getElementById('journal-direct');
+  const cur = Math.max(0, currentWeekIndex());
+  document.getElementById('journal-title').textContent = 'Weekly Reflection — Week ' + (cur+1);
+  if(CONFIG.journalFormUrl && CONFIG.journalFormUrl !== "REPLACE_WITH_YOUR_FORM_URL"){
+    let embedUrl = CONFIG.journalFormUrl.replace(/\/viewform.*$/, '/viewform') + '?embedded=true';
+    iframe.src = embedUrl;
+    direct.href = CONFIG.journalFormUrl;
+  } else {
+    iframe.removeAttribute('src');
+    iframe.style.display = 'none';
+    direct.parentElement.innerHTML = '<div class="warn-box" style="margin:0">⚠️ The journal form is not configured yet. Your parent needs to complete the setup (see SETUP_GUIDE.md) and add the Google Form URL to this site.</div>';
+  }
+}
+
+function renderBooks(){
+  const books = [
+    {wk:3,type:'Book',col:'#7c3aed',t:'Originals',a:'Adam Grant',d:"How non-conformists change the world. Stories of people who almost didn't act on their ideas.",when:'Mon–Tue of Week 4',url:'https://www.goodreads.com/book/show/25614523-originals'},
+    {wk:3,type:'Book',col:'#7c3aed',t:'The Lean Startup',a:'Eric Ries',d:'Read chapters 1–3. Build, measure, learn — reframes how you approach any project.',when:'Friday of Week 4',url:'https://www.goodreads.com/book/show/10127019-the-lean-startup'},
+    {wk:3,type:'Podcast',col:'#0d9488',t:'How I Built This',a:'Guy Raz · NPR',d:'Founder stories including failures. Start with Airbnb or Spanx.',when:'Monday of Week 4',url:'https://www.npr.org/series/490248027/how-i-built-this'},
+    {wk:3,type:'Podcast',col:'#0d9488',t:'Dare to Lead',a:'Brené Brown',d:'Vulnerability in leadership — for any future psychiatrist or founder.',when:'Thursday of Week 4',url:'https://brenebrown.com/podcast-show/dare-to-lead/'},
+    {wk:5,type:'Book',col:'#7c3aed',t:'The Design of Everyday Things',a:'Don Norman',d:'The bible of human-centered design. Essential for building a mental health product.',when:'Tuesday of Week 6',url:'https://www.goodreads.com/book/show/840.The_Design_of_Everyday_Things'},
+    {wk:5,type:'Book',col:'#7c3aed',t:"The Innovator's Prescription",a:'Clayton Christensen',d:'First two chapters on healthcare disruption. Where the real opportunities are.',when:'Monday of Week 6',url:'https://www.goodreads.com/book/show/3598882-the-innovator-s-prescription'},
+    {wk:5,type:'Podcast',col:'#0d9488',t:'Acquired',a:'Gilbert & Rosenthal',d:'Deep dives into how companies were built. Try the Moderna episode.',when:'Monday of Week 6',url:'https://www.acquired.fm/'},
+    {wk:5,type:'Podcast',col:'#0d9488',t:'StartUp',a:'Gimlet Media',d:'Season 1 follows a founder in real time. Raw, honest, funny.',when:'Wednesday of Week 6',url:'https://gimletmedia.com/shows/startup'},
+    {wk:6,type:'Book',col:'#7c3aed',t:'Talk Like TED',a:'Carmine Gallo',d:'The most practical public speaking book for your age. Techniques you can use today.',when:'Mon–Tue of Week 7',url:'https://www.goodreads.com/book/show/17910144-talk-like-ted'},
+    {wk:6,type:'Book',col:'#7c3aed',t:'Made to Stick',a:'Chip & Dan Heath',d:'Why some ideas survive. Essential for pitching and patient communication.',when:'Wednesday of Week 7',url:'https://www.goodreads.com/book/show/69242.Made_to_Stick'},
+    {wk:6,type:'Book',col:'#7c3aed',t:'Brotopia',a:'Emily Chang',d:"What the startup world looks like for women. Know what you're walking into.",when:'Thursday of Week 7',url:'https://www.goodreads.com/book/show/34884091-brotopia'},
+    {wk:6,type:'Podcast',col:'#0d9488',t:'Masters of Scale',a:'Reid Hoffman',d:'How Airbnb and Netflix pitched investors. Unlike any other business podcast.',when:'Tuesday of Week 7',url:'https://mastersofscale.com/'},
+    {wk:6,type:'Podcast',col:'#0d9488',t:'The Pitch',a:'Gimlet Media',d:'Real entrepreneurs pitching real investors. Listen before your own pitch.',when:'Thursday of Week 7',url:'https://gimletmedia.com/shows/the-pitch'}
+  ];
+  const groups = [
+    {wk:3, title:'Week 4 — Foundations & Mindset'},
+    {wk:5, title:'Week 6 — Health Tech & Social Enterprise'},
+    {wk:6, title:'Week 7 — Pitch, Speak & Lead'}
+  ];
+  document.getElementById('books-content').innerHTML = groups.map(g => {
+    const unlk = isUnlocked(g.wk);
+    const items = books.filter(b => b.wk === g.wk);
+    return `<div class="sec-title">${g.title}</div>
+      ${unlk ? '' : `<div class="warn-box" style="margin:0 0 12px">🔒 Unlocks the week of ${weekDateRange(g.wk).split('–')[0].trim()}.</div>`}
+      ${unlk ? items.map(b => `
+        <div class="rcard">
+          <div class="rctype" style="color:${b.col}">${b.type==='Book'?'📖':'🎙'} ${b.type}</div>
+          <h4>${b.t}</h4><div class="rcauth">${b.a}</div>
+          <div class="rcdesc">${b.d}</div>
+          <div class="rcwhen">📅 ${b.when}</div>
+          <a class="btn btn-ghost" style="padding:8px 16px;font-size:12px" href="${b.url}" target="_blank" rel="noopener">↗ ${b.type==='Book'?'View on Goodreads':'Listen Free'}</a>
+        </div>`).join('') : ''}
+      <div style="height:18px"></div>`;
+  }).join('');
+}
+
+function toggleDay(wi,di){document.getElementById('day-'+wi+'-'+di).classList.toggle('open')}
+function wtab(wi,tid,el){el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');['sched','res'].forEach(id=>{const tc=document.getElementById('wt-'+id);if(tc)tc.classList.toggle('active',id===tid)});window.scrollTo(0,0)}
+
+function go(view, fromWeek){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.botnav-item').forEach(n => n.classList.remove('active'));
+  if(view==='home'){document.getElementById('nav-home').classList.add('active');renderHome()}
+  else if(view==='books'){document.getElementById('nav-books').classList.add('active');renderBooks()}
+  else if(view==='journal'){document.getElementById('nav-journal').classList.add('active');setupJournal()}
+  else if(view==='week'){document.getElementById('nav-home').classList.add('active')}
+  window.scrollTo(0,0);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
